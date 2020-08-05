@@ -1,5 +1,9 @@
+#All the mathematical operations are defined in this script
+
+#List of accepted mathematical operations
 operadoresAceitos = ["+", "-", "/", "%", "*", "^"]
 
+#Handles the math evaluation
 def fazContaIndividual(lvalue, rvalue, operacao):
 
   if operacao == "+":
@@ -41,7 +45,7 @@ def divide(lvalue, rvalue):
   if rvalue != 0:
     return lvalue / rvalue
   else:
-    return lvalue #Devolve o valor para a pilha
+    return lvalue #Returns lvalue to the stack
 
 
 

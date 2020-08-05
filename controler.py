@@ -24,11 +24,21 @@ class CalculatorController:
 
 
   def avaliaExpressao(self):
+    #Variables that will be used for error handling
+    houveErroDeEntrada = False
+    stringsErrados = []
+
+    #Getting the input
     entrada = self.janela.getDisplayText()
-    self.calculadora.recebeInputDoUsuario(entrada)
-    self.calculadora.fazContas()
+    houveErroDeEntrada, stringsErrados = self.calculadora.recebeInputDoUsuario(entrada)
     
-    self.mostraResultado()
+    #Requesting the calculator to do the math
+    if not houveErroDeEntrada:
+      self.calculadora.fazContas()
+    else:
+      self.janela.showInputPopUpErrorMessage(stringsErrados)
+    
+    self.mostraResultado() #Displaying result in the stack
     
   def mostraResultado(self):
     resultado = self.calculadora.getResultado()
@@ -37,10 +47,12 @@ class CalculatorController:
     self.janela.inputWidget.setText('')
 
 
+  #This function either works as a backspace for the display or deletes the last
+  #item in the stack
   def apagaChar(self):
     textoDaJanela = self.janela.getDisplayText()
-    if len(textoDaJanela) > 0:
-      textoDaJanela = textoDaJanela[:-1]
+    if len(textoDaJanela) > 0: #If there is any text in the display
+      textoDaJanela = textoDaJanela[:-1] #Deletes the last item in the text
       self.janela.setDisplaytext(textoDaJanela)
     
     elif self.calculadora.getTamanhoPilhaDeNumeros() > 0:
@@ -48,12 +60,13 @@ class CalculatorController:
 
     self.atualizaWidgetDaPilha()
 
+  #Changes the position of the last two items added to the stack
   def trocaPosPilha(self):
     self.calculadora.trocaPosicaoDosUltimosDaPilha()
     self.atualizaWidgetDaPilha()
 
+  #This function handles updating the stack widget
   def atualizaWidgetDaPilha(self):
-    
     self.limpaWidgetDaPilha()
 
     comprimentoDaPilha = self.calculadora.getTamanhoPilhaDeNumeros()
@@ -63,7 +76,7 @@ class CalculatorController:
         labelText = str(index) + ': ' + str(self.calculadora.pilhaDeNumeros[comprimentoDaPilha - index - 1])
         self.janela.stackLabels[index].setText( labelText )
 
-
+  #This function clears the stack widget
   def limpaWidgetDaPilha(self):
     for index in range(0, 5):
       self.janela.stackLabels[index].setText( str(index) + ': ' )

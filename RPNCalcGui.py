@@ -1,12 +1,6 @@
-'''
-This is a simple RPN Calculator made with Python and PyQt5
-Done by: Gabriel Fernandes
-Email: gabriel.f.r.bojikian@gmail.com
-
-'''
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QLineEdit, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QApplication, QLineEdit, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPushButton, QMessageBox
 import controler
 
 class RPNCalcUi(QWidget):
@@ -16,7 +10,8 @@ class RPNCalcUi(QWidget):
     self.masterLayout = QHBoxLayout() #Master layout for the program
     self.leftLayout = QVBoxLayout() #Layout for the keyboard and the input screen
     self.rightLayout = QVBoxLayout() #Layout for the stack display
-
+    
+    #Create buttons and displays
     self.criaWidgetEntrada()
     self.criaBotoes()
     self.criaDisplayPilha()
@@ -32,6 +27,9 @@ class RPNCalcUi(QWidget):
   def criaBotoes(self):
     self.buttons = {}
     buttonsLayout = QGridLayout()
+    #We will use a map to declare the buttons
+    #The index is the button text and the tuple value indicates the position
+    #of the button on the app keyboard
     self.buttons = {
       '^'         : (0, 0),
       'Switch'    : (0, 1),
@@ -55,6 +53,7 @@ class RPNCalcUi(QWidget):
       '+'         : (4, 3),
     }
 
+    #Creating the buttons based on the map
     for text, pos in self.buttons.items():
       self.buttons[text] = QPushButton(text)
       buttonsLayout.addWidget(self.buttons[text], pos[0], pos[1])
@@ -81,7 +80,23 @@ class RPNCalcUi(QWidget):
   def clearDisplay(self):
     self.inputWidget.setText('')
 
+  def showInputPopUpErrorMessage(self, listaStringsErrados):
+    mensagemDeErro = self.compoeMensagemDeErroDeEntrada(listaStringsErrados)
+    msg = QMessageBox()
+    msg.setWindowTitle("Error")
+    msg.setText(mensagemDeErro)
+    msg.setIcon(QMessageBox.Warning)
 
+    x = msg.exec_()
+
+  def compoeMensagemDeErroDeEntrada(self, listaStringsErrados):
+    mensagemDeErro = "Error - The following entries are invalid:\n"
+    for item in listaStringsErrados:
+      mensagemDeErro += item
+      mensagemDeErro += " "
+    
+    return mensagemDeErro
+    
 if __name__ == '__main__':
   app = QApplication(sys.argv)
   win = RPNCalcUi()
