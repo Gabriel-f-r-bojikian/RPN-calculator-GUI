@@ -7,16 +7,15 @@ class calculadoraRPN:
     self.pilhaDeNumeros = []
     self.pilhaDeOperacoes = []
 
+
   def recebeInputDoUsuario(self, entrada):
     bufferNumeros = []
     bufferOperadores = []
-    bufferNumeros, bufferOperadores = self.separaNumeroDeOperador(entrada)
-    print("Numeros: ")
-    print(bufferNumeros)
-    print("Operadores: ")
-    print(bufferOperadores)
+    bufferEntrada = entrada.split(' ')
+    bufferNumeros, bufferOperadores = self.separaNumeroDeOperador(bufferEntrada)
     self.montaPilhaNumeros(bufferNumeros)
     self.montaPilhaOperacoes(bufferOperadores)
+
 
   def separaNumeroDeOperador(self, entrada):
     listaNumeros = []
@@ -29,6 +28,7 @@ class calculadoraRPN:
         listaNumeros.append(float(item))
 
     return listaNumeros, listaOperadores
+
 
   def montaPilhaNumeros(self, listaDeNumeros):
     for numero in listaDeNumeros:
@@ -45,30 +45,23 @@ class calculadoraRPN:
     valorDireito = 0
     valorEsquerdo = 0
     while len(self.pilhaDeOperacoes) > 0:
-      print("Operadores do loop: ")
-      print(self.pilhaDeOperacoes)
-      if not len(self.pilhaDeOperacoes) == 0:
-        operacao = self.pilhaDeOperacoes.pop(0)
-      else:
-        break
+      operacao = self.pilhaDeOperacoes.pop(0)
       
       if not len(self.pilhaDeNumeros) == 0:
         valorDireito = self.pilhaDeNumeros.pop()
       else:
-        #raise Exception("Pilha vazia")
-        break
+        break #Chega aqui se pilha está vazia
       
       if not len(self.pilhaDeNumeros) == 0:
         valorEsquerdo = self.pilhaDeNumeros.pop()
       else:
         #print("Erro: Numero insuficiente de argumentos")
         self.pilhaDeNumeros.append(valorDireito)
-        break
+        break #Chega aqui se pilha está vazia
 
       resultado = operacoes.fazContaIndividual(valorEsquerdo, valorDireito, operacao)
       self.pilhaDeNumeros.append(resultado)
 
-      #print("\t= ", resultado, "\n")
 
   def getResultado(self):
     if len(self.pilhaDeNumeros) > 0:
@@ -76,17 +69,13 @@ class calculadoraRPN:
     else:
       return -3.14
 
-  def loopPrincipal(self):
-    while True:
-      print("")
-      print(self.pilhaDeNumeros)
-      entrada = input('>')
-      numeros, operadores = self.recebeInputDoUsuario(entrada)
-
-      self.montaPilhaNumeros(numeros)
-      self.montaPilhaOperacoes(operadores)
+  def trocaPosicaoDosUltimosDaPilha(self):
+    if self.getTamanhoPilhaDeNumeros() > 1:
+      valor1 = self.pilhaDeNumeros.pop()
+      valor2 = self.pilhaDeNumeros.pop()
+      self.pilhaDeNumeros.append(valor1)
+      self.pilhaDeNumeros.append(valor2)
       
-      self.fazContas()
 
 def confirmaSeFloat(valor):
   try:
@@ -94,8 +83,3 @@ def confirmaSeFloat(valor):
     return True
   except ValueError:
     return False
-
-
-if __name__ == '__main__':
-  calc = calculadoraRPN()
-  calc.loopPrincipal()

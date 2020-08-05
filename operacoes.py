@@ -41,7 +41,6 @@ def divide(lvalue, rvalue):
   if rvalue != 0:
     return lvalue / rvalue
   else:
-    print("Erro: Divisão por zero")
     return lvalue #Devolve o valor para a pilha
 
 
