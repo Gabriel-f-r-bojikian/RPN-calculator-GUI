@@ -7,6 +7,8 @@ Email: gabriel.f.r.bojikian@gmail.com
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QLineEdit, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPushButton
+from functools import partial
+import calculadoraRPN
 
 
 class RPNCalcUi(QWidget):
@@ -71,10 +73,67 @@ class RPNCalcUi(QWidget):
   def _setUpLayouts(self):
     self.masterLayout.addLayout(self.leftLayout)
     self.masterLayout.addLayout(self.rightLayout)
+  
+  def setDisplaytext(self, message):
+    self.inputWidget.setText(message)
+    self.inputWidget.setFocus()
+  
+  def getDisplayText(self):
+    return self.inputWidget.text()
+
+  def clearDisplay(self):
+    self.inputWidget.setText('')
+
+
+class CalculatorController:
+  def __init__(self, view, calc):
+    self._view = view
+    self._calculator = calc
+    self._connectSignals()
+
+  def _buildExpression(self, sub_exp):
+    expression = self._view.getDisplayText() + sub_exp
+    self._view.setDisplaytext(expression)
+  
+  def _connectSignals(self):
+    for btnText, btn in self._view.buttons.items():
+      if btnText not in {'Backspace', 'Enter', 'Space', 'Switch'}:
+        btn.clicked.connect(partial(self._buildExpression, btnText))
+
+    self._view.buttons['Space'].clicked.connect(partial(self._buildExpression, ' '))
+    self._view.buttons['Enter'].clicked.connect(partial(self._evaluateExpression))
+    self._view.inputWidget.returnPressed.connect(partial(self._evaluateExpression))
+    #self._view.buttons['Enter'].clicked.connect(partial(self._displayResult))
+
+
+  def _evaluateExpression(self):
+    print("I'm looping here")
+    entrada = self._view.getDisplayText()
+    self._calculator.recebeInputDoUsuario(entrada)
+    self._calculator.fazContas()
+    
+    self._displayResult()
+    
+  def _displayResult(self):
+    resultado = self._calculator.getResultado()
+    self._view.setDisplaytext( str(resultado) )
+    self._updateStackWidget()
+    self._view.inputWidget.setText('')
+
+  def _updateStackWidget(self):
+    for index in range(0, 5):
+      if index < self._calculator.getTamanhoPilhaDeNumeros():
+        self._view.stackLabels[index].setText( str(self._calculator.pilhaDeNumeros[index]) )
+
+
+
 
 if __name__ == '__main__':
   app = QApplication(sys.argv)
   win = RPNCalcUi()
-
   win.show()
+
+  calculadora = calculadoraRPN.calculadoraRPN()
+  CalculatorController(view = win, calc = calculadora)
+
   sys.exit(app.exec_())
